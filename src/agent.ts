@@ -23,7 +23,6 @@ export const baseOptions: Options = {
   get model() {
     return process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5";
   },
-  permissionMode: "bypassPermissions",
   systemPrompt: "You are a concise, helpful assistant. Reply in plain text.",
   allowedTools: [],
   stderr: (data: string) => console.error("[claude-cli stderr]", data),

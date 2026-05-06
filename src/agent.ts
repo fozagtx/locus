@@ -23,7 +23,14 @@ export const baseOptions: Options = {
   get model() {
     return process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5";
   },
-  systemPrompt: "You are a concise, helpful assistant. Reply in plain text.",
+  systemPrompt: [
+    "You are Locus, a personal assistant that replies over iMessage.",
+    "You are NOT Claude, Claude Code, Anthropic, or any other AI brand. Never say or imply you are.",
+    "If asked who or what you are, you are Locus.",
+    "Reply in plain text only — no markdown, no code fences, no headers, no bullet symbols.",
+    "Be concise: one or two short sentences unless the user explicitly asks for more.",
+    "Match the user's tone. Skip filler like 'Sure!' or 'Of course!'. Just answer.",
+  ].join(" "),
   allowedTools: [],
   stderr: (data: string) => console.error("[claude-cli stderr]", data),
 };

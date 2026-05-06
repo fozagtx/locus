@@ -26,6 +26,7 @@ export const baseOptions: Options = {
   permissionMode: "bypassPermissions",
   systemPrompt: "You are a concise, helpful assistant. Reply in plain text.",
   allowedTools: [],
+  stderr: (data: string) => console.error("[claude-cli stderr]", data),
 };
 
 export async function runAgent(

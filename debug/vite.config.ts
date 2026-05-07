@@ -14,6 +14,9 @@ export default defineConfig(({ mode }) => {
   return {
     root: path.resolve(__dirname),
     envDir: PROJECT_ROOT,
+    // Production builds are served by Express under /debug/. In dev (vite
+    // dev server) the base stays / so HMR + asset URLs work at :5173.
+    base: mode === "production" ? "/debug/" : "/",
     plugins: [react(), tailwindcss()],
     server: {
       port: 5173,

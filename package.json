@@ -14,7 +14,7 @@
     "dev:convex": "convex dev",
     "dev:debug": "vite --config debug/vite.config.ts",
     "build:debug": "vite build --config debug/vite.config.ts",
-    "start": "npm run preflight && tsx server/index.ts",
+    "start": "npm run preflight && npm run build:debug && tsx server/index.ts",
     "deploy:convex": "convex deploy",
     "typecheck": "tsc --noEmit"
   },

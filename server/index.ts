@@ -2,6 +2,9 @@ import "./env-setup.js";
 import express from "express";
 import cors from "cors";
 import { createServer } from "node:http";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import { WebSocketServer } from "ws";
 import { addClient } from "./broadcast.js";
 import { startSpectrum } from "./spectrum.js";
@@ -48,9 +51,33 @@ async function main() {
   app.use("/composio/webhook", express.raw({ type: "application/json", limit: "2mb" }));
   app.use(express.json({ limit: "2mb" }));
 
+  // The debug UI calls /api/* (matches Vite's dev proxy convention). In
+  // production we serve the SPA from the same origin, so strip the prefix
+  // and route to the underlying handlers (/composio, /memory, /chat, …).
+  app.use((req, _res, next) => {
+    if (req.url.startsWith("/api/")) {
+      req.url = req.url.slice(4);
+    }
+    next();
+  });
+
   app.get("/health", (_req, res) => {
     res.json({ ok: true, service: "locus" });
   });
+
+  // Serve the debug dashboard under /debug if it has been built. Built by
+  // `pnpm build:debug` (Vite, output: debug/dist). On Railway this runs as
+  // part of `pnpm start`. Locally during development, run `pnpm dev` instead
+  // — Vite serves the UI directly at :5173 with HMR.
+  const here = dirname(fileURLToPath(import.meta.url));
+  const debugDist = resolve(here, "..", "debug", "dist");
+  if (existsSync(debugDist)) {
+    app.use("/debug", express.static(debugDist));
+    // SPA fallback for any /debug/* path so client-side state survives reloads
+    app.get("/debug/*", (_req, res) => {
+      res.sendFile(resolve(debugDist, "index.html"));
+    });
+  }
 
   await startSpectrum();
   app.use("/composio", createComposioRouter());

@@ -136,7 +136,10 @@ async function main() {
   });
 
   const port = Number(process.env.PORT ?? 3456);
-  server.listen(port, () => {
+  // Bind explicitly to 0.0.0.0 so Railway's IPv4 proxy can reach us. Without
+  // this, Node binds to :: (IPv6 only) on dual-stack containers and the edge
+  // proxy returns 502 "Application failed to respond".
+  server.listen(port, "0.0.0.0", () => {
     console.log(`locus server listening on :${port}`);
     console.log(`  health      GET  http://localhost:${port}/health`);
     console.log(`  chat        POST http://localhost:${port}/chat`);

@@ -73,8 +73,10 @@ async function main() {
   const debugDist = resolve(here, "..", "debug", "dist");
   if (existsSync(debugDist)) {
     app.use("/debug", express.static(debugDist));
-    // SPA fallback for any /debug/* path so client-side state survives reloads
-    app.get("/debug/*", (_req, res) => {
+    // SPA fallback — runs for any /debug/* request that didn't match a static
+    // file. Express 5 (path-to-regexp v8) rejects bare `*` wildcards in route
+    // patterns, so this is expressed as a plain middleware mounted on /debug.
+    app.use("/debug", (_req, res) => {
       res.sendFile(resolve(debugDist, "index.html"));
     });
   }

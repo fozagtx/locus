@@ -65,6 +65,16 @@ async function main() {
     res.json({ ok: true, service: "locus" });
   });
 
+  // Root route — gives Railway's default healthcheck something to hit and
+  // points humans at the debug dashboard.
+  app.get("/", (_req, res) => {
+    if (existsSync(debugDist)) {
+      res.redirect("/debug/");
+    } else {
+      res.json({ ok: true, service: "locus" });
+    }
+  });
+
   // Serve the debug dashboard under /debug if it has been built. Built by
   // `pnpm build:debug` (Vite, output: debug/dist). On Railway this runs as
   // part of `pnpm start`. Locally during development, run `pnpm dev` instead

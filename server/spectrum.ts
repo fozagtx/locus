@@ -58,12 +58,21 @@ export async function startSpectrum(): Promise<void> {
 
   (async () => {
     if (!app) return;
+    console.log("[spectrum] message stream open — waiting for inbound");
+    let total = 0;
     for await (const [space, message] of app.messages) {
+      total++;
+      // Surface EVERYTHING the upstream pipe yields, even messages we'll skip,
+      // so silent-zero-inbound debugging has a clear signal.
+      const spaceKind = imessage.is(space) ? "imessage" : "other";
+      const phone = imessage.is(space) ? space.phone : "(non-imessage)";
+      console.log(
+        `[spectrum] inbound #${total} kind=${spaceKind} phone=${phone} content.type=${message.content.type}`,
+      );
       if (!imessage.is(space)) continue;
       if (message.content.type !== "text") continue;
 
       const content = message.content.text;
-      const phone = space.phone;
       const conversationId = `sms:${phone}`;
       const turnTag = Math.random().toString(36).slice(2, 8);
       const preview = content.length > 100 ? content.slice(0, 100) + "…" : content;
@@ -103,6 +112,9 @@ export async function startSpectrum(): Promise<void> {
         console.error(`[turn ${turnTag}] handler error`, err);
       }
     }
+    console.warn(
+      `[spectrum] message stream ended after ${total} message(s) — upstream closed iterator`,
+    );
   })().catch((err) => console.error("[spectrum] message loop error", err));
 }
 

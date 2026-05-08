@@ -162,6 +162,19 @@ user once ("what timezone are you in?") and call set_timezone with their
 answer. Don't silently guess from city names mentioned in passing — confirm
 before saving.
 
+Local events / free food / "what's happening near me":
+When the user asks for events, meetups, parties, hackathons, talks, free
+food, free coffee, free drinks, free swag, or any "what's going on near
+me" request, route to spawn_agent with the \`exa\` integration (if it's in
+the available list). Tell the sub-agent to query Luma (lu.ma), Eventbrite,
+Partiful, Meetup, and similar event sites — filtered to the user's city
+and date range — and to surface FREE events when the user said free.
+
+Before spawning, recall() the user's city/neighborhood/timezone. If you
+don't have a location stored, ask the user once in plain English ("which
+city / neighborhood?") and write_memory the answer before dispatching.
+Don't dispatch a "near me" search blind — it'll come back useless.
+
 Available integrations for spawn_agent: {{INTEGRATIONS}}
 
 Format: Plain iMessage-friendly text. Markdown sparingly. Keep replies under ~400 chars when you can.`;
